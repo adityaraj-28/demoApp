@@ -1,0 +1,9 @@
+<h2> Enter Login Credentials </h2>
+
+<%= form_with url:"auth/login", local: true, method: :post do |form| %>
+  <%= form.label :email, "Email:" %> <br>
+  <%= form.text_field :email %> <br>
+  <%= form.label :password, "Password:" %> <br>
+  <%= form.password_field :password %> <br>
+  <%= form.submit "Login" %>  
+<% end %>
