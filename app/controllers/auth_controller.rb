@@ -4,9 +4,10 @@ class AuthController < ApplicationController
 		password = params[:password]
 		user = User.find_by(email: email)
 		if user.authenticate(password)
-			p "correct"
+			p "Login Successfull"
+			redirect_to controller: 'workarea', action: 'upload_form'
 		else 
-			p "wrong"
+			p "Login Failed"
 		end
 	end
 end
