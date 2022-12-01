@@ -1,3 +1,5 @@
+require "gnuplot"
+
 class WorkareaController < ApplicationController
 	@@client = AWSLocalClient.new
 	def index
@@ -52,7 +54,15 @@ class WorkareaController < ApplicationController
 			res = get_median_for_field csv_string, field_name
 		end
 		message = "#{operation} of #{field_name} for #{file_name} is: #{res}"
-		StatsMailer.statsComputed(to_user: user_email, message: message).deliver_later
+		
+		NewStatsMailer.send_email(to_user: user_email, message: message).deliver_later
+
+		if @@client.upload_result_to_s3? message, file_name, user_email, field_name, operation
+			p "Result uploaded to csv"
+		else
+			p "Result upload to s3 failed"
+		end 
+
 		redirect_to controller: 'notification', action: 'notify', message: message
 	end
 
@@ -70,7 +80,6 @@ class WorkareaController < ApplicationController
 		res = nil if values.empty?
 		sorted = values.sort
 		len = sorted.length
-		byebug
 		res = (sorted[(len - 1) / 2] + sorted[len / 2]) / 2.0
 		return res
 	end
