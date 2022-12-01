@@ -1,0 +1,7 @@
+<h1> Upload CSV Form </h1>
+<%= form_with url:"/workarea/upload_csv", local: true, method: :post do |form| %>
+  <%= form.label :file_path, "File Path (enter full path):" %>  &nbsp; &nbsp;
+  <%= form.text_field :file_path %> <br>
+  <%= form.hidden_field :user_email, value: @user_email %>
+  <%= form.submit "Upload" %>  
+<% end %>

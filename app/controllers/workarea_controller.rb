@@ -1,5 +1,3 @@
-require "gnuplot"
-
 class WorkareaController < ApplicationController
 	@@client = AWSLocalClient.new
 	def index
@@ -7,7 +5,7 @@ class WorkareaController < ApplicationController
 
 	def upload_form
 		@user_email = params[:owner_email]
-		p "In upload_form"
+		p session[:access_token]
 	end
 
 	def upload_csv

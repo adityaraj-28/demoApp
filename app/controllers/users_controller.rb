@@ -5,6 +5,7 @@ class UsersController < ApplicationController
 
 	def create
 		@user = User.new(user_params)
+		byebug
 		if User.find(user[:id])
 			flash[:notice] = "User already exists"
 		if @user.save
