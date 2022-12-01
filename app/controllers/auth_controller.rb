@@ -5,6 +5,8 @@ class AuthController < ApplicationController
 		user = User.find_by(email: email)
 		if user.authenticate(password)
 			p "Login Successfull"
+			session[:logged_in] = true
+			session[:user]  = email
 			redirect_to controller: 'workarea', action: 'upload_form', owner_email: email
 		else 
 			p "Login Failed"
@@ -15,7 +17,7 @@ class AuthController < ApplicationController
 		args = {
 		    client_id: ENV['GOOGLE_CLIENT_ID'],
 		    response_type: 'code',
-		    scope: 'email openid',
+		    scope: 'https://www.googleapis.com/auth/userinfo.email',
 		    redirect_uri: 'http://localhost:3000/auth/callback?provider=google',
 		    access_type: 'offline'
 		 }
@@ -34,7 +36,29 @@ class AuthController < ApplicationController
 
 	  	# Save the access token (step 6)
 	  	session[:access_token] = response['access_token']
+	  	session[:logged_in] = true
 	  	
-	  	redirect_to controller: 'workarea', action: 'upload_form'
+	  	user_email = get_user_email
+
+	  	session[:user] = user_email
+	  	
+	  	redirect_to :controller => 'users', :action => 'create' , email: user_email, password: nil, source: 'google'
+	end
+
+	def logout
+		session.delete(:access_token)
+		session[:logged_in] = false
+		session.delete(:user)
+		redirect_to '/'
+	end
+
+	private 
+	def get_user_email
+		headers = {
+		  'Content-Type': 'application/json',
+		  'Authorization': "Bearer #{session[:access_token]}"
+		}
+		res = HTTParty.get('https://www.googleapis.com/oauth2/v3/userinfo', headers: headers)
+		return res["email"]
 	end
 end

@@ -1,4 +1,5 @@
 class WorkareaController < ApplicationController
+	before_action :require_login
 	@@client = AWSLocalClient.new
 	def index
 	end
@@ -30,6 +31,13 @@ class WorkareaController < ApplicationController
 		redirect_to controller: 'notification', action: 'notify', message: message, user_email: user_email
 	end
 
+	def get_combined_stats
+		file_name = params[:file_name]
+		user_email = params[:user_email]
+		sv_string = @@client.get_csv_object file_name
+		metadata = @@client.get_object_metadata file_name
+	end
+	
 	def get_stats
 		file_name = params[:file_name]
 		user_email = params[:user_email]
@@ -100,6 +108,13 @@ class WorkareaController < ApplicationController
 			res.append(values[pos])
 		end
 		return res
+	end
+
+	private 
+	def require_login
+		if session[:logged_in] == false
+			redirect_to '/'
+		end
 	end
 	
 end

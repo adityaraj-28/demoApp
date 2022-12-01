@@ -1,23 +1,23 @@
 class UsersController < ApplicationController
 	def new
-		@user = User.new
+
+	end
+	def create
+		create_user params[:email], params[:password], params[:source]
 	end
 
-	def create
-		@user = User.new(user_params)
-		byebug
-		if User.find(user[:id])
+	def create_user email, password, source
+		if User.find_by(email: email)
 			flash[:notice] = "User already exists"
-		if @user.save
+			redirect_to '/workarea/upload_form'
+		end
+		user = User.new(email: email, password: password, source: source)
+		if user.save
 			flash[:notice] = "User sucessfully signed up!"
-			redirect_to '/workarea/index'
+			redirect_to '/workarea/upload_form'
 		else
 			render 'new'
 		end
 	end
 
-	private
-	def user_params
-		params.require(:user).permit(:email, :password)
-	end
 end
