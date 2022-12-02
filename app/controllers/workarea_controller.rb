@@ -1,3 +1,5 @@
+require 'gnuplot'
+
 class WorkareaController < ApplicationController
 	before_action :require_login
 	@@client = AWSLocalClient.new
@@ -65,6 +67,28 @@ class WorkareaController < ApplicationController
 		redirect_to controller: 'notification', action: 'notify', message: message
 	end
 
+	def plot
+		file_name = params[:file_name]
+		x_field = params[:x_field]
+		y_field = params[:y_field]
+		csv_string = @@client.get_csv_object file_name
+		x = get_all_field_values csv_string, x_field
+		y = get_all_field_values csv_string, y_field
+		Gnuplot.open do |gp|
+			Gnuplot::Plot.new( gp ) do |plot|
+		  		plot.title  "Array Plot Example"
+			    plot.xlabel x_field
+			    plot.ylabel y_field
+
+			    plot.data << Gnuplot::DataSet.new( [x, y] ) do |ds|
+			    	ds.with = "linespoints"
+	      			ds.notitle
+	    		end
+  			end
+		end
+		render html: "<h3> Plotted in a new window </h3>".html_safe
+	end
+
 	private
 	def get_max_value_for_field csv_string, field_name
 		#validate all fields are numbers
@@ -74,7 +98,6 @@ class WorkareaController < ApplicationController
 
 	private
 	def get_median_for_field csv_string, field_name
-		#validate all fields are numbers 
 		values = get_all_field_values csv_string, field_name
 		res = nil if values.empty?
 		sorted = values.sort
