@@ -1402,6 +1402,7 @@ GEM
     erubi (1.11.0)
     globalid (1.0.0)
       activesupport (>= 5.0)
+    gnuplot (2.6.2)
     httparty (0.20.0)
       mime-types (~> 3.0)
       multi_xml (>= 0.5.2)
@@ -1533,6 +1534,7 @@ DEPENDENCIES
   capybara
   debug
   dotenv-rails
+  gnuplot
   httparty
   importmap-rails
   jbuilder

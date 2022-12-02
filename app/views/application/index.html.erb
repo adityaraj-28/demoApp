@@ -1,3 +1,5 @@
+<h3> <%= @message %> </h3>
+
 <h2> Enter Login Credentials </h2>
 
 <%= form_with url:"auth/login", local: true, method: :post do |form| %>
@@ -7,3 +9,9 @@
   <%= form.password_field :password %> <br>
   <%= form.submit "Login" %>  
 <% end %>
+<br>
+<%=link_to "Login with google", "/google/oauth" %>
+<br>
+<%= link_to "Logout", "/logout"%>
+<br>
+<%= link_to "Upload CSV",  "/workarea/upload_form"%>

@@ -5,11 +5,11 @@ class NewStatsMailer < ApplicationMailer
   #
   #   en.new_stats_mailer.send_email.subject
   #
-  def send_email (to_user:, message:)
+  def send_email (to_user:, file_name:)
+    attachments[file_name] = File.read(file_name)
     mail(
       to: to_user,
       subject: "Stats generated",
-      body: message
      )
   end
 end

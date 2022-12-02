@@ -1,6 +1,6 @@
 <h2> Enter details for Signing Up </h2>
 
-<%= form_with(model: @user, local: true) do |form| %>
+<%= form_with url:'/users/create', local: true do |form| %>
   <%= form.label :email, "Email:" %> <br>
   <%= form.text_field :email %> <br>
   <%= form.label :password, "Password:" %> <br>

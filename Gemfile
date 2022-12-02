@@ -46,6 +46,7 @@ gem 'aws-sdk'
 
 gem 'dotenv-rails'
 gem 'httparty'
+gem 'gnuplot'
 
 # Use Sass to process CSS
 # gem "sassc-rails"
