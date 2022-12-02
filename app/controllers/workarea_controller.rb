@@ -30,19 +30,11 @@ class WorkareaController < ApplicationController
 		message = "CSV Template: " + list.join(", ")
 		redirect_to controller: 'notification', action: 'notify', message: message, user_email: user_email
 	end
-
-	def get_combined_stats
-		file_name = params[:file_name]
-		user_email = params[:user_email]
-		sv_string = @@client.get_csv_object file_name
-		metadata = @@client.get_object_metadata file_name
-	end
 	
 	def get_stats
 		file_name = params[:file_name]
 		user_email = params[:user_email]
 		field_name = params[:field_name]
-		operation = params[:operation]
 		csv_string = @@client.get_csv_object file_name
 		metadata = @@client.get_object_metadata file_name
 
@@ -54,21 +46,22 @@ class WorkareaController < ApplicationController
 		end
 		#edge case: same file name may belong to different users
 
-		if operation == "max"
-			res = get_max_value_for_field csv_string, field_name
-		elsif operation == "median" 
-			res = get_median_for_field csv_string, field_name
-		end
-		message = "#{operation} of #{field_name} for #{file_name} is: #{res}"
+		stats_file_name = "#{file_name}-#{field_name}-stats"
+		stats_file = File.new(stats_file_name, "w")
+		stats_file.write("Stats for Field: #{field_name}\n")
+		stats_file.write("Max: #{get_max_value_for_field csv_string, field_name}\n")
+		stats_file.write("Median: #{get_median_for_field csv_string, field_name}\n")
+		stats_file.close
 		
-		NewStatsMailer.send_email(to_user: user_email, message: message).deliver_later
+		NewStatsMailer.send_email(to_user: user_email, file_name: stats_file_name).deliver_later
 
-		if @@client.upload_result_to_s3? message, file_name, user_email, field_name, operation
+		if @@client.upload_file_with_metadata? stats_file_name, {}
 			p "Result uploaded to csv"
 		else
 			p "Result upload to s3 failed"
-		end 
+		end 		
 
+		message = "File created"
 		redirect_to controller: 'notification', action: 'notify', message: message
 	end
 
@@ -86,6 +79,10 @@ class WorkareaController < ApplicationController
 		res = nil if values.empty?
 		sorted = values.sort
 		len = sorted.length
+		sorted.map! { |ele|
+			ele.to_f
+		}
+
 		res = (sorted[(len - 1) / 2] + sorted[len / 2]) / 2.0
 		return res
 	end
